@@ -1,5 +1,4 @@
 import { useAtom } from "jotai"
-import { useEffect, useState } from "react"
 import { Switch } from "@/components/ui/base-ui/switch"
 import { Textarea } from "@/components/ui/base-ui/textarea"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
@@ -8,14 +7,10 @@ import { ConfigSection } from "../../../components/config-section"
 
 export function OriginSpoofSection() {
   const [originSpoof, setOriginSpoof] = useAtom(configFieldsAtomMap.originSpoof)
-  const [text, setText] = useState(() => (originSpoof?.origins || []).join("\n"))
+  const defaultText = (originSpoof?.origins || []).join("\n")
 
-  useEffect(() => {
-    setText((originSpoof?.origins || []).join("\n"))
-  }, [originSpoof?.origins])
-
-  const handleBlur = () => {
-    const lines = text
+  const handleBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
+    const lines = e.target.value
       .split("\n")
       .map((l) => l.trim())
       .filter((l) => l.length > 0)
@@ -48,10 +43,10 @@ export function OriginSpoofSection() {
             目标源列表（每行一个 URL 或 Origin，例如 http://localhost:11434）
           </label>
           <Textarea
+            key={defaultText}
             id="origin-spoof-textarea"
             rows={4}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
+            defaultValue={defaultText}
             onBlur={handleBlur}
             placeholder={"http://localhost:11434\nhttps://fanyi.youdao.com"}
             className="font-mono text-xs"

@@ -1,20 +1,23 @@
+import { browser } from "#imports"
 import { logger } from "@/utils/logger"
 
 const SPOOF_ORIGIN_RULE_ID_START = 75000
 const SPOOF_ORIGIN_RULE_ID_END = 75999
 
 export async function updateOriginSpoofRules(origins: string[]): Promise<void> {
-  if (typeof chrome === "undefined" || !chrome.declarativeNetRequest) {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (typeof browser === "undefined" || !browser.declarativeNetRequest) {
     return
   }
 
   try {
-    const existingRules = await chrome.declarativeNetRequest.getDynamicRules()
+    const existingRules = await browser.declarativeNetRequest.getDynamicRules()
     const removeRuleIds = existingRules
       .filter((r) => r.id >= SPOOF_ORIGIN_RULE_ID_START && r.id <= SPOOF_ORIGIN_RULE_ID_END)
       .map((r) => r.id)
 
-    const addRules: chrome.declarativeNetRequest.Rule[] = []
+    // DeclarativeNetRequest dynamic rule structure
+    const addRules = []
     let currentId = SPOOF_ORIGIN_RULE_ID_START
 
     for (const rawOrigin of origins) {
@@ -32,20 +35,18 @@ export async function updateOriginSpoofRules(origins: string[]): Promise<void> {
           id: currentId++,
           priority: 1,
           action: {
-            type: chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
+            type: "modifyHeaders" as const,
             requestHeaders: [
               {
                 header: "Origin",
-                operation: chrome.declarativeNetRequest.HeaderOperation.SET,
+                operation: "set" as const,
                 value: targetOrigin,
               },
             ],
           },
           condition: {
             urlFilter: `${targetOrigin}/*`,
-            resourceTypes: [
-              chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST,
-            ],
+            resourceTypes: ["xmlhttprequest" as const],
           },
         })
       } catch (e) {
@@ -53,7 +54,7 @@ export async function updateOriginSpoofRules(origins: string[]): Promise<void> {
       }
     }
 
-    await chrome.declarativeNetRequest.updateDynamicRules({
+    await browser.declarativeNetRequest.updateDynamicRules({
       removeRuleIds,
       addRules,
     })

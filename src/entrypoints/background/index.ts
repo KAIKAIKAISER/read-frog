@@ -1,7 +1,6 @@
 import "@/utils/zod-config"
 import type { Config, UiLanguage } from "@/types/config/config"
 import { browser, defineBackground } from "#imports"
-import { env } from "@/env"
 import { storageAdapter } from "@/utils/atoms/storage-adapter"
 import { selectFreshTranslateProviders } from "@/utils/config/default-translate-provider"
 import { CONFIG_STORAGE_KEY } from "@/utils/constants/config"
