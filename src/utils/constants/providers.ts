@@ -222,13 +222,6 @@ export const PROVIDER_ITEMS: Record<
     name: "Jalapeno Cloud",
     website: "https://www.jalapeno-cloud.ai/readfrog",
     apiKeyUrl: "https://www.jalapeno-cloud.ai/readfrog",
-    sponsor: {
-      sponsoring: true,
-      referUrl: "https://www.jalapeno-cloud.ai/readfrog",
-      // Both default to the generic sponsor wording; Jalapeno names its actual offer instead.
-      badgeI18nKey: "options.apiProviders.badges.sponsorJalapenoCloud",
-      ctaI18nKey: "options.apiProviders.sponsorCtaJalapenoCloud",
-    },
   },
   atlascloud: {
     logo: getLobeIconsCDNUrlFn("atlascloud"),
@@ -238,7 +231,7 @@ export const PROVIDER_ITEMS: Record<
   },
   "openai-compatible": {
     logo: () => customProviderLogo,
-    name: "Custom Chat Complete",
+    name: "OPENAI 兼容格式",
     website: `${env.WXT_WEBSITE_URL}/docs/providers/openai-compatible-providers`,
   },
   "open-responses": {
@@ -701,7 +694,6 @@ export const DEFAULT_PROVIDER_CONFIG_LIST: ProvidersConfig = [
   DEFAULT_PROVIDER_CONFIG["google-translate"],
   DEFAULT_PROVIDER_CONFIG["microsoft-translate"],
   DEFAULT_PROVIDER_CONFIG.openai,
-  DEFAULT_PROVIDER_CONFIG.jalapenocloud,
   DEFAULT_PROVIDER_CONFIG.deepseek,
 ]
 

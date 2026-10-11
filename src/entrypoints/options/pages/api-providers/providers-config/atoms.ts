@@ -24,7 +24,9 @@ export const selectedProviderIdAtom = atom(
   (get) => {
     const selected = get(internalSelectedProviderIdAtom)
     const providersConfig = get(configFieldsAtomMap.providersConfig)
-    const apiProvidersConfig = getAPIProvidersConfig(providersConfig)
+    const apiProvidersConfig = getAPIProvidersConfig(providersConfig).filter(
+      (p) => p.provider !== "jalapenocloud",
+    )
 
     if (
       selected !== undefined &&

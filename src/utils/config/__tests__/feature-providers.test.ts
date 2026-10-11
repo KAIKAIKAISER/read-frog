@@ -2,6 +2,7 @@ import type { ProviderConfig } from "@/types/config/provider"
 import type { HostedAiStatus, HostedAiTierStatus } from "@/utils/hosted-ai/types"
 import { describe, expect, it } from "vitest"
 import { DEFAULT_CONFIG } from "@/utils/constants/config"
+import { DEFAULT_PROVIDER_CONFIG } from "@/utils/constants/providers"
 import { buildFeatureProviderPatch } from "@/utils/constants/feature-providers"
 import { isSystemProviderSelectorItem } from "@/utils/providers/provider-display"
 import {
@@ -17,7 +18,9 @@ import {
 } from "../helpers"
 
 function getProviderById(id: string): ProviderConfig {
-  const provider = DEFAULT_CONFIG.providersConfig.find((item) => item.id === id)
+  const provider =
+    DEFAULT_CONFIG.providersConfig.find((item) => item.id === id) ??
+    Object.values(DEFAULT_PROVIDER_CONFIG).find((item) => item.id === id)
   if (!provider) throw new Error(`Provider "${id}" not found in DEFAULT_CONFIG.providersConfig`)
   return provider
 }
@@ -584,7 +587,7 @@ describe("feature providers", () => {
       const result = resolveLanguageDetectionConfigForModeChange(
         {
           mode: "basic",
-          providerId: "jalapenocloud-default",
+          providerId: "deepseek-default",
         },
         "llm",
         DEFAULT_CONFIG.providersConfig,
@@ -592,7 +595,7 @@ describe("feature providers", () => {
 
       expect(result).toEqual({
         mode: "llm",
-        providerId: "jalapenocloud-default",
+        providerId: "deepseek-default",
       })
     })
 

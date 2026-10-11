@@ -181,7 +181,7 @@ options:
           description: Built-in large language model providers, no need to fill in most configurations like Base URL
         compatibleProviders:
           title: Compatible API providers
-          description: Use Custom Chat Complete for Chat Completions-compatible APIs, or Custom Responses for Open Responses APIs.
+          description: Use OpenAI Compatible for Chat Completions-compatible APIs, or Custom Responses for Open Responses APIs.
         pureTranslationProviders:
           title: Pure translation providers
           description: Providers focused on translation features without large language model capabilities
@@ -249,7 +249,7 @@ options:
       name:
         builtInAi: Built-in AI
         builtInAiAdvance: Advanced Built-in AI
-        customChatComplete: Custom Chat Complete
+        customChatComplete: OpenAI Compatible
         customResponses: Custom Responses
       attribution:
         builtInAi: Read Frog's hosted standard model. Non-Ultra users can use it only for Custom AI Actions; Ultra members can use it on more features.

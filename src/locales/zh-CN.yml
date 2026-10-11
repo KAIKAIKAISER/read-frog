@@ -181,7 +181,7 @@ options:
           description: 内置的大语言模型提供商，无需填写大部分配置比如 Base URL
         compatibleProviders:
           title: 兼容 API 提供商
-          description: 兼容 Chat Completions 的 API 使用自定义 Chat Complete，Open Responses API 使用自定义 Responses。
+          description: 兼容 Chat Completions 的 API 使用 OPENAI 兼容格式，Open Responses API 使用自定义 Responses。
         pureTranslationProviders:
           title: 纯翻译提供商
           description: 专注于翻译功能的提供商，没有大语言模型能力
@@ -249,7 +249,7 @@ options:
       name:
         builtInAi: 内置 AI
         builtInAiAdvance: 高级内置 AI
-        customChatComplete: 自定义 Chat Complete
+        customChatComplete: OPENAI 兼容格式
         customResponses: 自定义 Responses
       attribution:
         builtInAi: 由 Read Frog 托管的普通模型。非 Ultra 用户仅支持在自定义 AI 指令使用，Ultra 用户支持在更多功能上使用。

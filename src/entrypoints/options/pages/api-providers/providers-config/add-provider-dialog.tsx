@@ -47,7 +47,7 @@ export default function AddProviderDialog({ onClose }: { onClose: () => void }) 
           groupDescription={i18n.t(
             `options.apiProviders.dialog.groups.${groupKey as keyof typeof PROVIDER_GROUPS}.description`,
           )}
-          providerTypes={group.types}
+          providerTypes={group.types.filter((type) => type !== "jalapenocloud")}
           handleAddProvider={handleAddProvider}
         />
       ))}

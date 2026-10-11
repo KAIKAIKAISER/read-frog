@@ -81,7 +81,7 @@ function useRequestedProvider() {
     }
 
     const requestedType = getRequestedProviderType(search)
-    if (!requestedType || !isAPIProvider(requestedType)) return
+    if (!requestedType || !isAPIProvider(requestedType) || requestedType === "jalapenocloud") return
 
     // Claimed before anything awaits: adding a provider rewrites the config this effect reads,
     // and React's development double-invoke runs it a second time. Either would add a duplicate.
@@ -134,7 +134,9 @@ export function ProvidersConfig() {
 
 function ProviderCardList() {
   const [providersConfig, setProvidersConfig] = useAtom(configFieldsAtomMap.providersConfig)
-  const apiProvidersConfig = getAPIProvidersConfig(providersConfig)
+  const apiProvidersConfig = getAPIProvidersConfig(providersConfig).filter(
+    (p) => p.provider !== "jalapenocloud",
+  )
   const [selectedProviderId, setSelectedProviderId] = useAtom(selectedProviderIdAtom)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const didLockInitialSelectionRef = useRef(false)
