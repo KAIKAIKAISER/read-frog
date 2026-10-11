@@ -173,6 +173,18 @@ const uiLanguageSchema = z
   .default("auto")
 export type UiLanguage = z.infer<typeof uiLanguageSchema>
 
+// Origin header spoofing schema (similar to kiss-translator disabled origin list)
+const originSpoofSchema = z
+  .object({
+    enabled: z.boolean().default(true),
+    origins: z.array(z.string()).default([]),
+  })
+  .default({
+    enabled: true,
+    origins: [],
+  })
+export type OriginSpoofConfig = z.infer<typeof originSpoofSchema>
+
 // Complete config schema
 export const configSchema = z
   .object({
@@ -193,6 +205,7 @@ export const configSchema = z
     uiLanguage: uiLanguageSchema,
     translationHub: translationHubSchema,
     glossary: glossaryConfigSchema,
+    originSpoof: originSpoofSchema,
   })
   .superRefine((data, ctx) => {
     for (const featureKey of FEATURE_KEYS) {

@@ -38,8 +38,8 @@ import { setupSidePanelMessageHandler } from "./side-panel"
 import { setupSubtitlesTranslationHandlers } from "./subtitles-translation"
 import { translationMessage } from "./translation-signal"
 import { setupTTSPlaybackMessageHandlers } from "./tts-playback"
-import { setupUninstallSurvey } from "./uninstall-survey"
 import { setupVideoSummaryHandlers } from "./video-summary"
+import { updateOriginSpoofRules } from "@/utils/origin-rules"
 
 export default defineBackground({
   type: "module",
@@ -54,13 +54,7 @@ export default defineBackground({
 
       await ensureInitializedConfig()
 
-      // Open tutorial page when extension is installed. `from=install` tells
-      // fresh installs apart from other visits in the website's guide analytics.
-      if (details.reason === "install") {
-        await browser.tabs.create({
-          url: `${env.WXT_WEBSITE_URL}/guide/step-1?from=install`,
-        })
-      }
+      // Do not open official website guide on install
 
       // Deliberately last: probing Google Translate can hang for seconds on networks that
       // block it, and nothing above should wait for that. Awaiting inside the listener
@@ -147,6 +141,9 @@ export default defineBackground({
       const config = await ensureInitializedConfig()
       currentUiLanguage = config?.uiLanguage ?? "auto"
       await initI18n(currentUiLanguage)
+      if (config?.originSpoof?.enabled) {
+        await updateOriginSpoofRules(config.originSpoof.origins)
+      }
     })()
 
     proxyFetch()
@@ -161,27 +158,26 @@ export default defineBackground({
     // Setup on-demand iframe injection after page translation is enabled.
     setupIframeInjection()
 
-    // i18n bootstrap for the non-React background context. Runs after the synchronous
-    // listener registration above (MV3 requires listeners before the first await). The
-    // context menu and the uninstall-survey URL both resolve i18n.t at registration time,
-    // so they must be created AFTER initI18n or they freeze in the wrong language.
+    // i18n bootstrap for the non-React background context.
     void (async () => {
       await backgroundReady
       void initializeContextMenu()
-      await setupUninstallSurvey()
     })()
 
-    // Keep background-resolved strings in the selected language when it changes.
-    // The context menu re-creates itself via its own config watcher
-    // (registerContextMenuListeners), so here we only drive the i18next singleton and
-    // re-set the frozen (localized) uninstall-survey URL.
+    // Watch config changes
     storageAdapter.watch<Config>(CONFIG_STORAGE_KEY, (newConfig) => {
       void (async () => {
         await backgroundReady
+        if (newConfig.originSpoof) {
+          if (newConfig.originSpoof.enabled) {
+            await updateOriginSpoofRules(newConfig.originSpoof.origins)
+          } else {
+            await updateOriginSpoofRules([])
+          }
+        }
         if (newConfig.uiLanguage === currentUiLanguage) return
         currentUiLanguage = newConfig.uiLanguage
         await setUiLanguage(newConfig.uiLanguage)
-        await setupUninstallSurvey()
       })()
     })
   },

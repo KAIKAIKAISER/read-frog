@@ -339,6 +339,10 @@ export const DEFAULT_CONFIG: Config = {
     promptId: DEFAULT_TRANSLATE_PROMPTS_CONFIG.promptId,
   },
   glossary: { ...DEFAULT_GLOSSARY_CONFIG },
+  originSpoof: {
+    enabled: true,
+    origins: ["http://localhost:11434"],
+  },
 }
 
 /**

@@ -3,6 +3,7 @@ import { PageLayout } from "../../components/page-layout"
 import { AppearanceAndLanguageSection } from "./appearance-and-language"
 import { ConfigManagementSection } from "./config"
 import { ExtensionActivationSection } from "./extension-activation"
+import { OriginSpoofSection } from "./origin-spoof"
 import { TranslationLanguageSection } from "./translation-language"
 import { UserExperienceSection } from "./user-experience"
 
@@ -16,6 +17,7 @@ export function PreferencePage() {
       <AppearanceAndLanguageSection />
       <TranslationLanguageSection />
       <ExtensionActivationSection />
+      <OriginSpoofSection />
       <ConfigManagementSection />
       <UserExperienceSection />
     </PageLayout>
