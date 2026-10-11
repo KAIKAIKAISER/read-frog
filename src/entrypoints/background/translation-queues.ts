@@ -55,7 +55,12 @@ export function getQueuedTranslationRouting(
 function isSerializedPageProvider(
   provider: QueuedTranslationProvider,
 ): provider is SerializableProviderRef {
-  return "kind" in provider && (provider.kind === "local" || provider.kind === "system")
+  return (
+    !!provider &&
+    typeof provider === "object" &&
+    "kind" in provider &&
+    (provider.kind === "local" || provider.kind === "system")
+  )
 }
 
 export function getLocalProviderConfig(provider: QueuedTranslationProvider): ProviderConfig | null {

@@ -95,7 +95,7 @@ export default function ProviderSelector({
   selectContentProps,
 }: ProviderSelectorProps) {
   const { theme } = useTheme()
-  const currentProvider = providers.find((p) => p.id === value)
+  const currentProvider = providers.find((p) => p.id === value) ?? (providers.length > 0 ? providers[0] : undefined)
   const providerGroups = getProviderSelectorGroups(providers)
 
   if (providerGroups.length > 1) {
@@ -164,14 +164,19 @@ function GroupedSelect({
     >
       <SelectTrigger className={className} size={triggerSize}>
         <SelectValue placeholder={placeholder}>
-          {(provider: ProviderSelectorOption) => (
-            <ProviderIcon
-              logo={getProviderLogo(provider, theme)}
-              name={getProviderName(provider)}
-              size="sm"
-              textClassName={triggerNameClassName}
-            />
-          )}
+          {(provider: ProviderSelectorOption | null | undefined) => {
+            if (!provider) {
+              return placeholder ? <span className="text-muted-foreground">{placeholder}</span> : null
+            }
+            return (
+              <ProviderIcon
+                logo={getProviderLogo(provider, theme)}
+                name={getProviderName(provider)}
+                size="sm"
+                textClassName={triggerNameClassName}
+              />
+            )
+          }}
         </SelectValue>
       </SelectTrigger>
       <SelectContent {...selectContentProps}>
@@ -234,14 +239,19 @@ function UngroupedSelect({
     >
       <SelectTrigger className={className} size={triggerSize}>
         <SelectValue placeholder={placeholder}>
-          {(provider: ProviderSelectorOption) => (
-            <ProviderIcon
-              logo={getProviderLogo(provider, theme)}
-              name={getProviderName(provider)}
-              size="sm"
-              textClassName={triggerNameClassName}
-            />
-          )}
+          {(provider: ProviderSelectorOption | null | undefined) => {
+            if (!provider) {
+              return placeholder ? <span className="text-muted-foreground">{placeholder}</span> : null
+            }
+            return (
+              <ProviderIcon
+                logo={getProviderLogo(provider, theme)}
+                name={getProviderName(provider)}
+                size="sm"
+                textClassName={triggerNameClassName}
+              />
+            )
+          }}
         </SelectValue>
       </SelectTrigger>
       <SelectContent {...selectContentProps}>
