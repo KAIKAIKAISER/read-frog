@@ -6,7 +6,6 @@ import { Icon } from "@iconify/react"
 import { useSelector } from "@tanstack/react-store"
 import { useAtomValue, useSetAtom } from "jotai"
 import { createContext, use, useState } from "react"
-import { PlanBadge } from "@/components/badges/plan-badge"
 import { useAutosave } from "@/components/form/use-autosave"
 import ProviderIcon from "@/components/provider-icon"
 import { useTheme } from "@/components/providers/theme-provider"
@@ -383,7 +382,6 @@ function AssignmentRow({
   checked,
   children,
   disabled = false,
-  requiresUltra = false,
   onCheckedChange,
 }: {
   checked: boolean
@@ -394,14 +392,10 @@ function AssignmentRow({
 }) {
   return (
     // A wrapping label gives the switch its accessible name and makes the text
-    // itself a click target. The badge is a sibling of the label text rather
-    // than part of it, so the row's text node stays exactly the feature name.
+    // itself a click target.
     <label className="flex w-fit items-center gap-2">
       <Switch checked={checked} disabled={checked || disabled} onCheckedChange={onCheckedChange} />
       <span className="text-sm">{children}</span>
-      {requiresUltra && (
-        <PlanBadge plan="ultra" upgradeTooltip={i18n.t("hostedAi.ultraBadge.tooltip")} />
-      )}
     </label>
   )
 }

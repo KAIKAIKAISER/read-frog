@@ -29,7 +29,7 @@ export function useFeatureProvider(featureKey: FeatureKey): FeatureProviderBindi
   const setConfig = useSetAtom(writeConfigAtom)
   const providersConfig = useAtomValue(configFieldsAtomMap.providersConfig)
   const translationMode = useAtomValue(configFieldsAtomMap.pageTranslation).mode
-  const providerId = FEATURE_PROVIDER_DEFS[featureKey].getProviderId(config)
+  const rawProviderId = FEATURE_PROVIDER_DEFS[featureKey].getProviderId(config)
 
   // Page translate in translationOnly mode cannot run on providers without
   // markup support (see translation-only-gate.ts) — hide them so the blocked
@@ -50,6 +50,13 @@ export function useFeatureProvider(featureKey: FeatureKey): FeatureProviderBindi
   }, [featureKey, providersConfig, hideTranslationOnlyUnsupported])
   const providers = useHostedAiProviderOptions(featureKey, baseProviders)
 
+  const effectiveProviderId = useMemo(() => {
+    if (providers.some((p) => p.id === rawProviderId)) {
+      return rawProviderId
+    }
+    return providers[0]?.id ?? rawProviderId
+  }, [providers, rawProviderId])
+
   const setProviderId = useCallback(
     (id: string) => void setConfig(buildFeatureProviderPatch({ [featureKey]: id })),
     [featureKey, setConfig],
@@ -57,8 +64,8 @@ export function useFeatureProvider(featureKey: FeatureKey): FeatureProviderBindi
 
   return {
     providers,
-    providerId,
-    providerConfig: getProviderConfigById(providersConfig, providerId) ?? null,
+    providerId: effectiveProviderId,
+    providerConfig: getProviderConfigById(providersConfig, effectiveProviderId) ?? null,
     setProviderId,
   }
 }
@@ -102,9 +109,16 @@ export function useCustomActionProviders(): CustomActionProvidersBinding {
   )
 
   const getProviderConfig = useCallback(
-    (action: SelectionToolbarCustomAction) =>
-      getProviderConfigById(providersConfig, action.providerId) ?? null,
-    [providersConfig],
+    (action: SelectionToolbarCustomAction) => {
+      const match = getProviderConfigById(providersConfig, action.providerId)
+      if (match) return match
+      const first = providers[0]
+      if (first) {
+        return getProviderConfigById(providersConfig, first.id) ?? null
+      }
+      return null
+    },
+    [providersConfig, providers],
   )
 
   return { actions, providers, getProviderConfig, setActionProviderId }

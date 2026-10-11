@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import type { APIProviderConfig } from "@/types/config/provider"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { render, screen } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
 import { AutosaveContext, toAutosaveSession } from "@/components/form/use-autosave"
@@ -8,13 +9,19 @@ import { DEFAULT_PROVIDER_CONFIG } from "@/utils/constants/providers"
 import { useProviderForm } from "../../provider-editor"
 import { ProviderURLField } from "../provider-url-field"
 
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+})
+
 function ProviderURLFieldHarness({ providerConfig }: { providerConfig: APIProviderConfig }) {
   const { form, autosave } = useProviderForm(providerConfig, async () => {})
 
   return (
-    <AutosaveContext value={toAutosaveSession(autosave)}>
-      <ProviderURLField form={form} />
-    </AutosaveContext>
+    <QueryClientProvider client={queryClient}>
+      <AutosaveContext value={toAutosaveSession(autosave)}>
+        <ProviderURLField form={form} />
+      </AutosaveContext>
+    </QueryClientProvider>
   )
 }
 

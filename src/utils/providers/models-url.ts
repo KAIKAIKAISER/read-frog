@@ -9,6 +9,10 @@ function replaceLastPathSegment(url: URL, segment: string): void {
 }
 
 export function getProviderModelsURL(providerConfig: ProtocolCompatibleLLMProviderConfig): string {
+  if (providerConfig.modelsURL?.trim()) {
+    return providerConfig.modelsURL.trim()
+  }
+
   const url = new URL(getProviderConnectionURL(providerConfig))
 
   if (isOpenResponsesLLMProviderConfig(providerConfig)) {

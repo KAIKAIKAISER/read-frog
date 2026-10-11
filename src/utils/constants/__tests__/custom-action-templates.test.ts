@@ -26,10 +26,9 @@ function createFromTemplate(id: string) {
   return template.createAction("openai-default")
 }
 
-// A locale's `blank.prompt` block, its indentation removed. i18n is mocked in
-// tests, so the text is read from the locale file.
 async function readBlankPrompt(locale: string): Promise<string | undefined> {
-  const text = await readFile(new URL(`../../../locales/${locale}.yml`, import.meta.url), "utf8")
+  const raw = await readFile(new URL(`../../../locales/${locale}.yml`, import.meta.url), "utf8")
+  const text = raw.replace(/\r/g, "")
   const block = /^ {8}blank:\n(?: {10}.*\n)*? {10}prompt: \|-\n((?: {12}.*\n)+)/m.exec(text)?.[1]
   return block?.replace(/^ {12}/gm, "").trimEnd()
 }
@@ -37,7 +36,8 @@ async function readBlankPrompt(locale: string): Promise<string | undefined> {
 // A locale's dictionary preset as text: the system prompt (indentation
 // removed) and the Memory Tips field's name.
 async function readDictionaryMemoryTips(locale: string) {
-  const text = await readFile(new URL(`../../../locales/${locale}.yml`, import.meta.url), "utf8")
+  const raw = await readFile(new URL(`../../../locales/${locale}.yml`, import.meta.url), "utf8")
+  const text = raw.replace(/\r/g, "")
   const block = /^ {8}dictionary:\n((?: {10}.*\n|\n)+)/m.exec(text)?.[1] ?? ""
   const systemPrompt = /^ {10}systemPrompt: \|-\n((?: {12}.*\n|\n)+)/m
     .exec(block)?.[1]
@@ -191,7 +191,7 @@ describe("custom action template layouts", () => {
       const builtIn = createBuiltIn()
 
       expect(builtIn.id).toBe(actionId)
-      expect(builtIn.providerId).toBe("read-frog-free-ai")
+      expect(builtIn.providerId).toBe("openai-default")
       expect(builtIn.systemPrompt).toBe(preset.systemPrompt)
       expect(builtIn.outputSchema.map((field) => field.id)).toEqual(
         preset.outputSchema.map((field) => `default-${field.id}`),

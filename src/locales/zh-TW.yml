@@ -221,6 +221,10 @@ options:
         noModelsFound: 找不到模型
         label: 模型
         enterCustomModel: 輸入自訂模型名稱
+      modelsURL:
+        label: 模型清單網址（選填）
+        placeholder: "留空預設請求 /models，例如 https://api.openai.com/v1/models"
+        description: 用於取得可用模型清單的端點或網址。留空則自動根據基礎端點追加 /models。
       advancedOptions: 進階選項
       providerSettingLabels:
         region: 區域

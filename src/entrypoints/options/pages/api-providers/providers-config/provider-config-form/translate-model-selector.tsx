@@ -122,6 +122,24 @@ export const TranslateModelSelector = withForm({
             )}
           </form.Field>
         )}
+        {isProtocolCompatibleLLMProviderConfig(providerConfig) && (
+          <div className="mt-3">
+            <form.AppField name="modelsURL">
+              {(field) => (
+                <div className="flex flex-col gap-1.5">
+                  <field.InputFieldAutoSave
+                    label={i18n.t("options.apiProviders.form.modelsURL.label" as never)}
+                    placeholder={i18n.t("options.apiProviders.form.modelsURL.placeholder" as never)}
+                    value={((providerConfig as { modelsURL?: string }).modelsURL) ?? ""}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {i18n.t("options.apiProviders.form.modelsURL.description" as never)}
+                  </p>
+                </div>
+              )}
+            </form.AppField>
+          </div>
+        )}
       </div>
     )
   },

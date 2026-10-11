@@ -221,6 +221,10 @@ options:
         noModelsFound: No models found
         label: Model
         enterCustomModel: Enter the name of the custom model
+      modelsURL:
+        label: Models URL (Optional)
+        placeholder: "Defaults to /models, e.g. https://api.openai.com/v1/models"
+        description: The endpoint or URL used to fetch available models. Defaults to appending /models to the base URL.
       advancedOptions: Advanced options
       providerSettingLabels:
         region: Region

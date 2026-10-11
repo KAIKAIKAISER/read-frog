@@ -17,11 +17,6 @@ import { i18n } from "@/utils/i18n"
 import { getProviderConnectionURL } from "@/utils/providers/connection-url"
 import { getProviderModelsURL } from "@/utils/providers/models-url"
 
-interface ModelsResponse {
-  object: string
-  data: Array<{ id: string; object: string; created: number; owned_by: string }>
-}
-
 interface ModelSuggestionButtonProps {
   providerConfig: ProtocolCompatibleLLMProviderConfig
   onSelect: (model: string) => void
@@ -35,35 +30,65 @@ export function ModelSuggestionButton({
 }: ModelSuggestionButtonProps) {
   const { apiKey } = providerConfig
   const connectionURL = getProviderConnectionURL(providerConfig)
+  const targetModelsURL = getProviderModelsURL(providerConfig)
   const mutation = useMutation({
-    mutationKey: ["fetchModels", providerConfig.provider, connectionURL],
+    mutationKey: ["fetchModels", providerConfig.provider, connectionURL, targetModelsURL, apiKey],
     meta: {
       errorDescription: i18n.t("options.apiProviders.form.models.fetchError"),
     },
     mutationFn: async () => {
-      if (!apiKey) {
-        throw new Error(i18n.t("options.apiProviders.form.models.apiKeyRequired"))
+      const headers: Record<string, string> = {}
+      if (apiKey?.trim()) {
+        headers.Authorization = `Bearer ${apiKey.trim()}`
+      }
+      if (providerConfig.headers && typeof providerConfig.headers === "object") {
+        for (const [key, val] of Object.entries(providerConfig.headers)) {
+          if (typeof val === "string") {
+            headers[key] = val
+          }
+        }
       }
 
-      const response = await fetch(getProviderModelsURL(providerConfig), {
-        headers: { Authorization: `Bearer ${apiKey}` },
+      const response = await fetch(targetModelsURL, {
+        headers,
       })
       if (!response.ok) {
         throw new Error(await extractErrorMessage(response))
       }
 
-      const data: ModelsResponse = await response.json()
-      return data.data.map((m) => m.id)
+      const json = await response.json()
+      let list: unknown[] = []
+      if (Array.isArray(json?.data)) {
+        list = json.data
+      } else if (Array.isArray(json?.models)) {
+        list = json.models
+      } else if (Array.isArray(json)) {
+        list = json
+      }
+
+      const extracted: string[] = []
+      for (const item of list) {
+        if (typeof item === "string" && item.trim()) {
+          extracted.push(item.trim())
+        } else if (item && typeof item === "object") {
+          const id = (item as { id?: unknown; name?: unknown }).id ?? (item as { id?: unknown; name?: unknown }).name
+          if (typeof id === "string" && id.trim()) {
+            extracted.push(id.trim())
+          }
+        }
+      }
+
+      return Array.from(new Set(extracted))
     },
   })
 
   const handleFetch = () => {
-    if (!connectionURL) return
+    if (!connectionURL && !providerConfig.modelsURL) return
     mutation.reset()
     mutation.mutate()
   }
 
-  const isDisabled = disabled || !connectionURL
+  const isDisabled = disabled || (!connectionURL && !providerConfig.modelsURL)
 
   // Idle state - show fetch button
   if (mutation.isIdle) {
@@ -87,12 +112,14 @@ export function ModelSuggestionButton({
 
   // Error state - show error button with retry option
   if (mutation.isError) {
+    const errorMsg = mutation.error?.message || ""
     return (
       <Button
         type="button"
         variant="outline"
         size="xs"
         onClick={handleFetch}
+        title={errorMsg}
         className="text-red-500 hover:text-red-500"
       >
         <Icon icon="tabler:alert-circle" className="size-3.5" />
