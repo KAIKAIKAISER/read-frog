@@ -17,6 +17,9 @@ function needsApiKeyWarning(
     !!providerConfig &&
     isAPIProviderConfig(providerConfig) &&
     !isPureAPIProvider(providerConfig.provider) &&
+    !["openai-compatible", "open-responses", "ollama", "deeplx"].includes(
+      providerConfig.provider,
+    ) &&
     !providerConfig.apiKey
   )
 }

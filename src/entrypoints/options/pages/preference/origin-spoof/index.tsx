@@ -11,12 +11,13 @@ export function OriginSpoofSection() {
 
   const handleBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
     const lines = e.target.value
-      .split("\n")
+      .split(/[\n,;，；\s]+/)
       .map((l) => l.trim())
       .filter((l) => l.length > 0)
+    const uniqueLines = Array.from(new Set(lines))
     void setOriginSpoof({
       ...originSpoof,
-      origins: lines,
+      origins: uniqueLines,
     })
   }
 
@@ -40,7 +41,7 @@ export function OriginSpoofSection() {
       {originSpoof?.enabled && (
         <div className="flex flex-col gap-2 rounded-lg border border-border bg-card p-4">
           <label htmlFor="origin-spoof-textarea" className="text-sm font-medium">
-            目标源列表（每行一个 URL 或 Origin，例如 http://localhost:11434）
+            目标源列表（支持换行、中英文逗号 , ，、分号 ; ； 或空格分隔）
           </label>
           <Textarea
             key={defaultText}
@@ -48,11 +49,11 @@ export function OriginSpoofSection() {
             rows={4}
             defaultValue={defaultText}
             onBlur={handleBlur}
-            placeholder={"http://localhost:11434\nhttps://fanyi.youdao.com"}
+            placeholder={"http://localhost:11434, https://fanyi.youdao.com\nhttps://dict.youdao.com"}
             className="font-mono text-xs"
           />
           <p className="text-xs text-muted-foreground">
-            离开输入框后自动保存并生效。配置生效后，发往这些地址的请求将自动伪装同源 Origin。
+            离开输入框后自动保存并生效。支持使用换行、中英文逗号或分号分隔多个域名。保存后将自动格式化并伪装同源 Origin。
           </p>
         </div>
       )}

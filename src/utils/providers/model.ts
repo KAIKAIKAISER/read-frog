@@ -40,6 +40,7 @@ import { CONFIG_STORAGE_KEY } from "../constants/config"
 import { getProviderHeadersWithOverride } from "./headers"
 import { resolveModelId } from "./model-id"
 import { ProviderSetupError } from "./provider-setup-error"
+import { normalizeOpenAIBaseURL } from "./url-normalize"
 
 const DEDICATED_PROVIDER_FACTORY_BY_TYPE = {
   openai: createOpenAI,
@@ -119,9 +120,9 @@ export function getLanguageModelForConfig(providerConfig: LLMProviderConfig) {
     .when(isOpenAICompatibleLLMProviderConfig, (matchedConfig) =>
       createOpenAICompatible({
         name: matchedConfig.provider,
-        baseURL: matchedConfig.baseURL,
+        baseURL: normalizeOpenAIBaseURL(matchedConfig.baseURL),
         supportsStructuredOutputs: true,
-        ...(matchedConfig.apiKey && { apiKey: matchedConfig.apiKey }),
+        ...(matchedConfig.apiKey?.trim() && { apiKey: matchedConfig.apiKey.trim() }),
         ...(headers && { headers }),
       }),
     )
@@ -129,7 +130,7 @@ export function getLanguageModelForConfig(providerConfig: LLMProviderConfig) {
       createOpenResponses({
         name: matchedConfig.provider,
         url: matchedConfig.url,
-        ...(matchedConfig.apiKey && { apiKey: matchedConfig.apiKey }),
+        ...(matchedConfig.apiKey?.trim() && { apiKey: matchedConfig.apiKey.trim() }),
         ...(headers && { headers }),
       }),
     )
@@ -137,7 +138,7 @@ export function getLanguageModelForConfig(providerConfig: LLMProviderConfig) {
       DEDICATED_PROVIDER_FACTORY_BY_TYPE[matchedConfig.provider]({
         ...providerSpecificSettings,
         ...(matchedConfig.baseURL && { baseURL: matchedConfig.baseURL }),
-        ...(matchedConfig.apiKey && { apiKey: matchedConfig.apiKey }),
+        ...(matchedConfig.apiKey?.trim() && { apiKey: matchedConfig.apiKey.trim() }),
         ...(headers && { headers }),
       }),
     )

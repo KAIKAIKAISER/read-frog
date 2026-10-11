@@ -37,16 +37,27 @@ export const APIKeyField = withForm({
 
     return (
       <form.AppField name="apiKey">
-        {(field) => (
-          <div className="flex flex-col gap-2">
-            <field.InputFieldAutoSave
-              label="API Key"
-              labelAfter={<GetAPIKeyButton providerType={providerType} />}
-              labelExtra={<ConnectionTestButton providerConfig={providerConfig} />}
-              type={showAPIKey ? "text" : "password"}
-              className={cn(isHighlighted && "animate-ring-flash")}
-            />
-            <div className="mt-0.5 flex items-center space-x-2">
+        {(field) => {
+          const isOptionalKey =
+            providerType === "openai-compatible" ||
+            providerType === "open-responses" ||
+            providerType === "deeplx"
+
+          return (
+            <div className="flex flex-col gap-2">
+              <field.InputFieldAutoSave
+                label={isOptionalKey ? "API Key (可选)" : "API Key"}
+                placeholder={
+                  isOptionalKey
+                    ? "可选，本地模型或无鉴权反代可留空"
+                    : undefined
+                }
+                labelAfter={<GetAPIKeyButton providerType={providerType} />}
+                labelExtra={<ConnectionTestButton providerConfig={providerConfig} />}
+                type={showAPIKey ? "text" : "password"}
+                className={cn(isHighlighted && "animate-ring-flash")}
+              />
+              <div className="mt-0.5 flex items-center space-x-2">
               <Checkbox
                 id={`apiKey-${providerConfig.id}`}
                 checked={showAPIKey}
@@ -60,7 +71,8 @@ export const APIKeyField = withForm({
               </label>
             </div>
           </div>
-        )}
+        )
+      }}
       </form.AppField>
     )
   },

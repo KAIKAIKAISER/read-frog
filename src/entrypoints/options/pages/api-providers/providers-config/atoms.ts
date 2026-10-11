@@ -2,7 +2,7 @@ import { atom } from "jotai"
 import { requestEditorNavigationAtom } from "@/components/form/autosave-navigation"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
 import { getAPIProvidersConfig } from "@/utils/config/helpers"
-import { BUILT_IN_AI_PROVIDER_ID } from "@/utils/providers/provider-registry"
+import { isBuiltInAiProviderId } from "@/utils/providers/provider-registry"
 
 /**
  * The field a deep link asked Provider Config to draw attention to. Held as state rather than
@@ -23,15 +23,18 @@ const internalSelectedProviderIdAtom = atom<string | undefined>(undefined)
 export const selectedProviderIdAtom = atom(
   (get) => {
     const selected = get(internalSelectedProviderIdAtom)
-    if (selected !== undefined) {
+    const providersConfig = get(configFieldsAtomMap.providersConfig)
+    const apiProvidersConfig = getAPIProvidersConfig(providersConfig)
+
+    if (
+      selected !== undefined &&
+      !isBuiltInAiProviderId(selected) &&
+      apiProvidersConfig.some((p) => p.id === selected)
+    ) {
       return selected
     }
 
-    const providersConfig = get(configFieldsAtomMap.providersConfig)
-    const apiProvidersConfig = getAPIProvidersConfig(providersConfig)
-    const firstProviderId =
-      apiProvidersConfig.length > 0 ? apiProvidersConfig[0]!.id : BUILT_IN_AI_PROVIDER_ID
-    return firstProviderId
+    return apiProvidersConfig[0]?.id
   },
   (get, set, newValue: string | undefined) => {
     if (get(internalSelectedProviderIdAtom) === newValue) return Promise.resolve(true)
